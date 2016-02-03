@@ -111,6 +111,10 @@ if (Meteor.isClient) {
 
             return false;// stop the form submit from reloading the page
 
+        }, 
+
+        "change #url, keyup #url": function(event){
+            console.log('changing');
         }
     });
 }
