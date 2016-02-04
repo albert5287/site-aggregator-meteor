@@ -1,6 +1,29 @@
 Websites = new Mongo.Collection("websites");
 
+function validUrl(str) {
+    var url = addHttp(str);
+    var pattern = /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i; // fragment locater
+    if(!(pattern.test(url))) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function addHttp(url) {
+    if (!/^(f|ht)tps?:\/\//i.test(url)) {
+        url = "http://" + url;
+    }
+    return url;
+}
+
+RegExp.escape = function(s) {
+    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+};
+
 if (Meteor.isClient) {
+    Session.set('infoUrl', undefined);
+    Session.set('filterUrl', undefined);
     Meteor.call('getUrlInfo', "http://www.gold.ac.uk/computing/", function(error, result){
         console.log('error', error);
         console.log('result', result);
@@ -13,7 +36,23 @@ if (Meteor.isClient) {
     // helper function that returns all available websites
     Template.website_list.helpers({
         websites: function () {
-            return Websites.find({}, {sort : {upCount : -1}});
+            if(Session.get('filterUrl')){
+                return Websites.find(
+                    {
+                        url: {$regex : '^.*'+Session.get('filterUrl')+ '.*', $options : 'i'}
+                    }
+                );
+            }
+            else{
+                return Websites.find({}, {sort : {upCount : -1}});
+            }
+
+        }
+    });
+
+    Template.website_form.helpers({
+        infoUrl: function (){
+            return Session.get('infoUrl');
         }
     });
 
@@ -99,13 +138,43 @@ if (Meteor.isClient) {
         "click .js-toggle-website-form": function (event) {
             $("#website_form").toggle('slow');
         },
+        "click .js-search-website": function (event) {
+            Session.set('filterUrl', $('#search_filter').val());
+            /*console.log('search', filter);
+            var aux = Websites.find(
+                {
+                    url: {$regex : '^.*'+filter+ '.*', $options : 'i'}
+                }
+            );
+            //Session.set('websites', aux);
+            console.log('res', aux);*/
+        },
 
         "submit .js-save-website-form": function (event) {
 
             // here is an example of how to get the url out of the form:
-            var url = event.target.url.value;
+            var infoUrl = Session.get('infoUrl');
 
-            console.log("The url they entered is: " + url);
+            if(!Websites.findOne({url: infoUrl.url})) {
+                Websites.insert({
+                    title: infoUrl.title,
+                    url: infoUrl.url,
+                    description: infoUrl.description,
+                    createdOn: new Date()
+                });
+                Session.set('infoUrl',undefined);
+                $("#website_form").toggle('slow');
+                alert('url inserted');
+            }
+            else{
+                alert('url already inserted');
+            }
+
+
+
+
+
+            //console.log("The url they entered is: ",Session.get('infoUrl'));
 
             //  put your website saving code in here!
 
@@ -114,7 +183,20 @@ if (Meteor.isClient) {
         }, 
 
         "change #url, keyup #url": function(event){
-            console.log('changing');
+            // here is an example of how to get the url out of the form:
+            var url = event.currentTarget.value;
+            $('#submit_web_form').prop( "disabled", true );
+            if(validUrl(url)){
+                Meteor.call('getUrlInfo', url, function(error, result){
+                    if(!$.isEmptyObject(result)){
+                        Session.set('infoUrl',result);
+                        $('#submit_web_form').prop( "disabled", false );
+                    }
+                    else{
+                        Session.set('infoUrl',undefined);
+                    }
+                });
+            }
         }
     });
 }
@@ -125,16 +207,11 @@ if (Meteor.isServer) {
     Meteor.startup(function () {
         Meteor.methods({
             getUrlInfo: function (url) {
-                return Scrape.website(addhttp(url));
+                return Scrape.website(addHttp(url));
             }
         });
 
-        function addhttp(url) {
-            if (!/^(f|ht)tps?:\/\//i.test(url)) {
-                url = "http://" + url;
-            }
-            return url;
-        }
+
         // code to run on server at startup
         if (!Websites.findOne()) {
             console.log("No websites yet. Creating starter data.");
