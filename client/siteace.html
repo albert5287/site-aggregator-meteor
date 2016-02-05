@@ -3,28 +3,41 @@
 </head>
 
 <body>
-	<!-- navbar  - you will be putting the login functions here -->
-	<nav class="navbar navbar-default">
-	  <div class="container-fluid">
-	    <div class="navbar-header">
-	      <a class="navbar-brand" href="#">
-	        Site Ace
-	      </a>
-	    </div>
-        <div class="container">
-          <div class="navbar-text navbar-right">
-              {{> loginButtons}}
-          </div>
-        </div>
 
-	  </div>
-	</nav>
 
-	<div class="container">
-		{{> website_form}}
-		{{> website_list}}
-	</div>
 </body>
+
+
+<template name="ApplicationLayout">
+    {{> yield "navbar"}}
+    {{> yield "main"}}
+</template>
+
+<template name="indexPage">
+    <div class="container">
+        {{> website_form}}
+        {{> website_list}}
+    </div>
+</template>
+
+
+<template name="navbar">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">
+                    Site Ace
+                </a>
+            </div>
+            <div class="container">
+                <div class="navbar-text navbar-right">
+                    {{> loginButtons}}
+                </div>
+            </div>
+
+        </div>
+    </nav>
+</template>
 
 
 <template name="website_form">
@@ -88,7 +101,7 @@
 <!-- template that displays individual website entries -->
 <template name="website_item">
 <li>
-	<a href="{{url}}">{{title}}</a>
+	<a href="/website/{{_id}}">{{title}}</a>
 	<p>
 		{{description}}
 	</p>
@@ -113,4 +126,32 @@
     </p>
 	<!-- you will be putting your up and down vote buttons in here! -->
 </li>
+</template>
+
+<template name="detailWebsite">
+    <div class="container">
+        <a href="{{url}}">{{title}}</a>
+        <p>
+            {{description}}
+        </p>
+        <a href="#" class="btn btn-default js-upvote">
+            <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+        </a>
+        <a href="#" class="btn btn-default js-downvote">
+            <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+        </a>
+        <p>
+            create on: {{createdOn}}
+        </p>
+        <p>
+            <small>
+                Up Votes : {{upCount}}
+            </small>
+        </p>
+        <p>
+            <small>
+                Down Votes : {{downCount}}
+            </small>
+        </p>
+    </div>
 </template>
