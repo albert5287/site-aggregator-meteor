@@ -138,7 +138,6 @@ Template.website_form.events({
 
     "submit .js-save-website-form": function (event) {
 
-        // here is an example of how to get the url out of the form:
         var infoUrl = Session.get('infoUrl');
 
         if(!Websites.findOne({url: infoUrl.url})) {
@@ -175,6 +174,30 @@ Template.website_form.events({
                 }
             });
         }
+    }
+});
+
+Template.detailWebsite.events({
+    "click .js-toggle-comment-form": function (event) {
+        $("#comment_form").toggle('slow');
+    },
+    "click .js-search-website": function (event) {
+        Session.set('filterUrl', $('#search_filter').val());
+    },
+
+    "submit .js-save-comment-form": function (event) {
+        var comment = event.currentTarget.comment.value;
+
+        Websites.update(
+            this._id,
+            {
+                $push: {comments: comment}
+            }
+        );
+
+        $("#comment_form").toggle('slow');
+        return false;// stop the form submit from reloading the page
+
     }
 });
 

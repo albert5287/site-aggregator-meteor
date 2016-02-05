@@ -153,5 +153,42 @@
                 Down Votes : {{downCount}}
             </small>
         </p>
+        <br/>
+        <br/>
+        <br/>
+        {{>comments}}
     </div>
+
+</template>
+
+<template name="comments">
+
+    <div class="row">
+        <div class="col-sm-6">
+            <h3> Comments:</h3>
+        </div>
+
+        <div class="col-sm-6">
+            {{#if currentUser }}
+                <a class="btn btn-default js-toggle-comment-form" href="#">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> add new Comment
+                </a>
+                <div id="comment_form" class="hidden_div">
+                    <form class="js-save-comment-form">
+                        <div class="form-group">
+                            <label for="comment">Comment</label>
+                            <input type="text" id="comment" class="form-control"  placeholder="comment" required>
+                        </div>
+                        <button type="submit" id="submit_comment_form" class="btn btn-default">Submit</button>
+                    </form>
+                </div>
+            {{/if}}
+        </div>
+    </div>
+
+    {{#each comments}}
+    <li>{{this}}</li>
+    {{/each}}
+
+
 </template>
