@@ -1,7 +1,7 @@
 # site-aggregator-meteor
 
 The purpose of the application is to allow users to share, discuss and rate pages they find on the internet. The app also needs to have the following features:
-you can see a demo on the following link http://albert5287-site-aggregator.meteor.com/
+
 
 Use Bootstrap
 
@@ -26,3 +26,5 @@ Implement a search function that allows the user to search within the listed sit
 Recommend websites to users based on things they have up voted and commented on. E.g. if I up vote a site entitled ‘Tofu recipes’, it would recommend other sites with ‘tofu’ and ‘recipe’ in their titles or descriptions
 
 Deploy the application using the Meteor deploy command
+
+you can see a demo on the following link http://albert5287-site-aggregator.meteor.com/
